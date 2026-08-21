@@ -1,0 +1,4 @@
+# Mount the Remotion Video Plugin after the DeepSeek Harness base bundle.
+- insert:
+    - id: remotion-video-plugin
+      name: '@chenjie1129/dsh-remotion-video-plugin'
