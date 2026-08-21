@@ -1,0 +1,49 @@
+name: Bug report
+description: Report a reproducible plugin, skill, install, or render problem.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve Remotion Video Plugin. Do not include API keys, tokens, or private media.
+  - type: input
+    id: harness-version
+    attributes:
+      label: DeepSeek Harness version
+      placeholder: 0.1.0-rc.5
+    validations:
+      required: true
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: 22.22.0
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Include the smallest safe example that reproduces the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed credentials, private media, and other sensitive information.
+          required: true

@@ -1,0 +1,39 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "Reproducible promotion demo for Remotion Video Plugin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chenjie1129/remotion-video-plugin.git",
+    "directory": "demo"
+  },
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.515",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.515"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.515",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "^9.39.5",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion bundle",
+    "render:demo": "remotion render RemotionVideoPluginDemo ../.github/assets/remotion-video-plugin-demo.mp4",
+    "render:gif": "remotion render RemotionVideoPluginDemo ../.github/assets/remotion-video-plugin-demo.gif --codec=gif --scale=0.5 --every-nth-frame=3",
+    "render:poster": "remotion still DemoPoster ../.github/assets/demo-poster.png",
+    "render:social": "remotion still SocialPreview ../.github/assets/social-preview.png",
+    "upgrade": "remotion upgrade",
+    "lint": "eslint src && tsc"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}
