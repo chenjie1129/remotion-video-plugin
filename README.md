@@ -1,5 +1,7 @@
 # Remotion Video Plugin for DeepSeek Harness
 
+English | [简体中文](README.zh-CN.md)
+
 A standalone [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin that contributes the model- and user-invocable `remotion-video` skill. The skill guides Harness agents through inspecting an existing video project, scaffolding Remotion when needed, writing frame-driven React animations, previewing the composition, and rendering verified output.
 
 ## What it does
