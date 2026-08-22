@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "thresholds": {
+    "minimumFirstPassBuildRate": 0.9,
+    "minimumFinalRenderRate": 0.9,
+    "requiredMetadataPassRate": 1
+  },
+  "cases": [
+    {
+      "id": "launch-landscape-en",
+      "locale": "en-US",
+      "prompt": "Create a polished 12-second 16:9 product launch video with three feature beats and a final call to action. Render a still first, then an H.264 MP4.",
+      "format": "landscape",
+      "requirements": ["frame-driven animation", "three feature beats", "representative still", "final MP4"],
+      "expected": {"width": 1920, "height": 1080, "fps": 30, "minimumDurationSeconds": 10, "maximumDurationSeconds": 14, "audio": "optional"},
+      "stillFrames": [0, 90, 210, 359]
+    },
+    {
+      "id": "vertical-captions-zh",
+      "locale": "zh-CN",
+      "prompt": "制作一条 10 秒的 9:16 中文竖屏短视频，包含逐句字幕、产品卖点和结尾行动号召。先检查最长字幕画面，再渲染 MP4。",
+      "format": "vertical",
+      "requirements": ["Chinese captions", "mobile safe margins", "caption timing data", "final MP4"],
+      "expected": {"width": 1080, "height": 1920, "fps": 30, "minimumDurationSeconds": 9, "maximumDurationSeconds": 11, "audio": "optional"},
+      "stillFrames": [30, 150, 270]
+    },
+    {
+      "id": "data-story-negative-values",
+      "locale": "en-US",
+      "prompt": "Create a 10-second animated KPI comparison containing positive, zero, and negative values. Keep the scale stable and show units and source text.",
+      "format": "landscape",
+      "requirements": ["validated data", "stable scale", "negative values", "source label"],
+      "expected": {"width": 1920, "height": 1080, "fps": 30, "minimumDurationSeconds": 8, "maximumDurationSeconds": 12, "audio": "absent"},
+      "stillFrames": [0, 120, 299]
+    },
+    {
+      "id": "existing-project-pacing",
+      "locale": "en-US",
+      "prompt": "Improve the pacing and text entrances in the existing Remotion composition without renaming its composition ID or replacing the project's package versions.",
+      "format": "existing",
+      "requirements": ["preserve composition ID", "preserve versions", "frame-driven timing", "before and after evidence"],
+      "expected": {"width": 1280, "height": 720, "fps": 30, "minimumDurationSeconds": 10, "maximumDurationSeconds": 14, "audio": "optional"},
+      "stillFrames": [45, 180, 330]
+    },
+    {
+      "id": "dynamic-metadata",
+      "locale": "en-US",
+      "prompt": "Build a parameterized composition whose duration is derived from the number of validated story cards using calculateMetadata.",
+      "format": "parameterized",
+      "requirements": ["schema", "calculateMetadata", "validated defaults", "duration matches cards"],
+      "expected": {"width": 1920, "height": 1080, "fps": 30, "minimumDurationSeconds": 6, "maximumDurationSeconds": 30, "audio": "optional"},
+      "stillFrames": [0, 90, 180]
+    },
+    {
+      "id": "remote-asset-fallback",
+      "locale": "en-US",
+      "prompt": "Create a product scene that uses a remote image when available and a deterministic local fallback when the request fails. Prove the offline fallback renders.",
+      "format": "resilience",
+      "requirements": ["remote failure handling", "local fallback", "offline render", "no blank frame"],
+      "expected": {"width": 1280, "height": 720, "fps": 30, "minimumDurationSeconds": 4, "maximumDurationSeconds": 8, "audio": "absent"},
+      "stillFrames": [30, 90]
+    },
+    {
+      "id": "audio-caption-sync",
+      "locale": "en-US",
+      "prompt": "Create an 8-second explainer with a local voice track and word-timed captions. Verify the final file contains audio and inspect a cue boundary.",
+      "format": "multimedia",
+      "requirements": ["local audio", "word timing", "cue boundary still", "audio stream verification"],
+      "expected": {"width": 1920, "height": 1080, "fps": 30, "minimumDurationSeconds": 7, "maximumDurationSeconds": 9, "audio": "required"},
+      "stillFrames": [29, 30, 120]
+    },
+    {
+      "id": "dense-chinese-layout",
+      "locale": "zh-CN",
+      "prompt": "制作一个中英文混排的数据报告画面，验证最长标题、数字单位、标点换行和安全边距，不得出现裁切。",
+      "format": "typography",
+      "requirements": ["CJK font", "mixed-script baseline", "punctuation wrapping", "overflow inspection"],
+      "expected": {"width": 1920, "height": 1080, "fps": 30, "minimumDurationSeconds": 5, "maximumDurationSeconds": 10, "audio": "absent"},
+      "stillFrames": [0, 90, 180]
+    },
+    {
+      "id": "transition-boundaries",
+      "locale": "en-US",
+      "prompt": "Create three scenes connected by consistent transitions. Account for transition overlap in total duration and inspect both sides of each cut.",
+      "format": "sequencing",
+      "requirements": ["three scenes", "duration overlap", "consistent transitions", "boundary stills"],
+      "expected": {"width": 1920, "height": 1080, "fps": 30, "minimumDurationSeconds": 8, "maximumDurationSeconds": 15, "audio": "optional"},
+      "stillFrames": [89, 90, 179, 180]
+    },
+    {
+      "id": "broken-asset-recovery",
+      "locale": "en-US",
+      "prompt": "Diagnose a Remotion composition with a missing case-sensitive asset path. Fix only the asset reference, render a still, and report the evidence.",
+      "format": "recovery",
+      "requirements": ["diagnosis", "minimal edit", "Linux-safe path", "successful still"],
+      "expected": {"width": 1280, "height": 720, "fps": 30, "minimumDurationSeconds": 4, "maximumDurationSeconds": 12, "audio": "optional"},
+      "stillFrames": [30]
+    }
+  ]
+}

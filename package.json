@@ -1,7 +1,7 @@
 {
   "name": "@chenjie1129/dsh-remotion-video-plugin",
-  "version": "0.1.0",
-  "description": "Remotion video creation skill plugin for DeepSeek Harness",
+  "version": "0.4.0",
+  "description": "Remotion video creation and verified rendering plugin for DeepSeek Harness",
   "keywords": [
     "deepseek-harness",
     "dsh-plugin",
@@ -11,6 +11,10 @@
   ],
   "license": "MIT",
   "author": "chenjie1129",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "type": "module",
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
@@ -22,6 +26,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./tools": {
+      "types": "./dist/tools-plugin.d.ts",
+      "default": "./dist/tools-plugin.js"
+    },
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
@@ -29,6 +37,8 @@
     "dist",
     "assets",
     "docs",
+    "evaluations",
+    "scripts",
     "cordis.patch.yml",
     "README.md",
     "README.zh-CN.md",
@@ -48,7 +58,10 @@
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run test && npm run build && npm pack --dry-run",
+    "test:e2e": "npm run build && node scripts/tool-e2e.mjs",
+    "eval:validate": "node scripts/validate-evaluations.mjs",
+    "release:verify": "node scripts/verify-release.mjs",
+    "check": "npm run test && npm run eval:validate && npm run build && npm pack --dry-run",
     "prepack": "npm run build"
   },
   "dsh": {
@@ -58,13 +71,21 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.1-rc.1 <5",
-    "@deepseek-ai/dsh-skill": ">=0.0.1-rc.1 <0.2.0"
+    "@deepseek-ai/dsh-skill": ">=0.0.1-rc.1 <0.2.0",
+    "@deepseek-ai/dsh-subprocess": ">=0.1.0-rc.5 <0.2.0",
+    "@deepseek-ai/dsh-tools": ">=0.1.0-rc.5 <0.2.0"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/cordis": {
       "optional": true
     },
     "@deepseek-ai/dsh-skill": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-subprocess": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-tools": {
       "optional": true
     }
   },
