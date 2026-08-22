@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2026-08-22
+
+- Added workspace-confined `remotion_doctor`, `remotion_list_compositions`, `remotion_render_still`, `remotion_render_video`, and `remotion_probe_output` Harness tools.
+- Routed every command through Harness's managed subprocess seam with fixed argument arrays, credential scrubbing, bounded output, cancellation, and timeouts.
+- Added structured artifact hashes and media metadata to render results.
+- Kept the skill provider and executable tools in separate Cordis rows so each lifecycle remains independently reversible.
+
 ## 0.2.0 - 2026-08-22
 
 - Replaced the single long-form skill with a focused router and eight task-specific Remotion references.

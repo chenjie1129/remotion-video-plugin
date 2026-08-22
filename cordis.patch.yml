@@ -2,3 +2,5 @@
 - insert:
     - id: remotion-video-plugin
       name: '@chenjie1129/dsh-remotion-video-plugin'
+    - id: remotion-video-tools
+      name: '@chenjie1129/dsh-remotion-video-plugin/tools'

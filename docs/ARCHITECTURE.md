@@ -2,10 +2,11 @@
 
 ## Integration model
 
-The package has two DeepSeek Harness roles:
+The package has three DeepSeek Harness roles:
 
 1. Its manifest declares a `dsh.bundle.patch`, making it an installable profile bundle.
 2. Its Cordis plugin registers one provider with the existing `ctx.skills` service.
+3. Its separate tools plugin registers five structured operations with `ctx.tools` and executes through `ctx.subprocess`.
 
 The bundle patch inserts the same package as an ordinary Loader row. Harness mounts that row after the base bundle, so the skill registry already exists when the plugin's `apply()` function runs.
 
@@ -17,21 +18,28 @@ dsh profile
        -> remotion-video-plugin Loader row
             -> remotion-video provider
                  -> remotion-video skill body
+       -> remotion-video-tools Loader row
+            -> doctor / compositions / still / video / probe tools
+                 -> managed subprocess seam
 ```
 
 The provider returns immutable catalog metadata and loads `assets/remotion-video.md` only when Harness requests the complete skill. Disposing the Cordis plugin removes the provider registration through the registry lifecycle.
 
 ## Capability boundary
 
-This plugin contributes instructions, not a privileged renderer or shell executor. The model uses the tools and permission policy already assembled by the active Harness profile and agent preset. Consequently:
+The skill row contributes instructions. The tools row contributes a narrow renderer and metadata probe over the public Harness tool and subprocess seams. Consequently:
 
 - filesystem changes stay within the configured Harness filesystem policy;
-- package installation and rendering use the configured shell/subprocess capability;
+- package installation still uses the profile's ordinary shell capability;
+- rendering uses only a verified project-local Remotion executable and fixed argument arrays;
+- project, entry, output, props, frame, scale, codec, and concurrency inputs are bounded before execution;
+- output paths stay inside the session workspace and symlink escapes fail closed;
+- command output, process lifetime, cancellation, and teardown stay owned by `ctx.subprocess`;
 - approval requirements remain owned by the active permission preset;
 - model and tool activity remains part of the ordinary Harness session record;
 - Remotion and media licensing remain deployment and user responsibilities.
 
-The plugin does not introduce credentials, network clients, persistence, telemetry, a model provider, or a UI package.
+The plugin does not introduce credentials, an independent network client, persistence, telemetry, a model provider, or a UI package. Remotion itself may access project-declared remote assets or download its supported browser when the deployment has not configured one; those effects remain visible project/runtime responsibilities.
 
 ## Skill precedence
 

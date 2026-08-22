@@ -4,6 +4,55 @@ import { Context } from '@deepseek-ai/cordis'
 import SkillRegistry from '@deepseek-ai/dsh-skill'
 import { describe, expect, it } from 'vitest'
 import * as RemotionVideoPlugin from '../src/index.js'
+import { apply as applyRemotionTools } from '../src/tools-plugin.js'
+
+interface CapturedTool {
+  name: string
+  parameters: Record<string, unknown>
+  output: {
+    schema: unknown
+    render(args: unknown, value: unknown): unknown[]
+    presentationMeta?(args: unknown, value: unknown): unknown
+  }
+  execute(args: unknown, exec: { signal: AbortSignal }): Promise<unknown>
+  presentCall?(args: unknown): unknown
+  presentResult?(args: unknown, result: { content: unknown[]; isError: boolean; meta?: unknown }): unknown
+}
+
+function toolHarness(stdout = ''): {
+  context: Context
+  tools: CapturedTool[]
+  spawns: Array<{ argv: readonly string[]; cwd: string; env?: NodeJS.ProcessEnv }>
+} {
+  const tools: CapturedTool[] = []
+  const spawns: Array<{ argv: readonly string[]; cwd: string; env?: NodeJS.ProcessEnv }> = []
+  const reader = (text: string) => ({ readFrom: () => ({ text, lossy: false }) })
+  const context = {
+    tools: {
+      register(tool: CapturedTool) {
+        tools.push(tool)
+        return () => undefined
+      },
+    },
+    subprocess: {
+      resolveExecutable: (command: string) => Promise.resolve(command),
+      spawn(spec: { argv: readonly string[]; cwd: string; env?: NodeJS.ProcessEnv }) {
+        spawns.push(spec)
+        return {
+          done: Promise.resolve({ exitCode: 0, signal: null }),
+          collected: { stdout: reader(stdout), stderr: reader('') },
+        }
+      },
+    },
+  } as unknown as Context
+  return { context, tools, spawns }
+}
+
+function findTool(tools: CapturedTool[], name: string): CapturedTool {
+  const tool = tools.find(candidate => candidate.name === name)
+  if (!tool) throw new Error(`missing captured tool ${name}`)
+  return tool
+}
 
 describe('Remotion Video Plugin', () => {
   it('registers, loads, and disposes the remotion-video skill', async () => {
@@ -41,6 +90,7 @@ describe('Remotion Video Plugin', () => {
 
     expect(manifest.dsh?.bundle?.patch).toBe('./cordis.patch.yml')
     expect(patch).toContain("name: '@chenjie1129/dsh-remotion-video-plugin'")
+    expect(patch).toContain("name: '@chenjie1129/dsh-remotion-video-plugin/tools'")
   })
 
   it('ships every routed rule, reusable blueprint, and evaluation case', async () => {
@@ -63,5 +113,66 @@ describe('Remotion Video Plugin', () => {
     expect(suite.cases).toHaveLength(10)
     expect(new Set(suite.cases.map(testCase => testCase.id)).size).toBe(10)
     expect(suite.cases.every(testCase => testCase.stillFrames.length > 0)).toBe(true)
+  })
+
+  it('registers five structured Remotion workflow tools and diagnoses the demo', async () => {
+    const harness = toolHarness()
+    applyRemotionTools(harness.context)
+
+    expect(harness.tools.map(tool => tool.name)).toEqual([
+      'remotion_doctor',
+      'remotion_list_compositions',
+      'remotion_render_still',
+      'remotion_render_video',
+      'remotion_probe_output',
+    ])
+    expect(harness.tools.every(tool => typeof tool.output.schema === 'object')).toBe(true)
+
+    const doctor = findTool(harness.tools, 'remotion_doctor')
+    const result = await doctor.execute({ project_path: 'demo' }, { signal: new AbortController().signal }) as {
+      status: string
+      remotionVersion: string
+      checks: Array<{ name: string; status: string }>
+    }
+    expect(result.status).toBe('ready')
+    expect(result.remotionVersion).toMatch(/^4\./)
+    expect(result.checks).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: 'local Remotion CLI', status: 'pass' }),
+      expect.objectContaining({ name: 'bundled ffprobe', status: 'pass' }),
+    ]))
+    expect(harness.spawns).toHaveLength(0)
+  })
+
+  it('runs composition discovery with a fixed argv array and scrub-safe explicit environment', async () => {
+    const harness = toolHarness('DemoPoster RemotionVideoPluginDemo SocialPreview\n')
+    applyRemotionTools(harness.context)
+    const list = findTool(harness.tools, 'remotion_list_compositions')
+
+    const result = await list.execute({ project_path: 'demo' }, { signal: new AbortController().signal }) as {
+      compositions: string[]
+    }
+    expect(result.compositions).toEqual(['DemoPoster', 'RemotionVideoPluginDemo', 'SocialPreview'])
+    expect(harness.spawns).toHaveLength(1)
+    expect(harness.spawns[0]?.argv).toEqual(expect.arrayContaining(['compositions', '--quiet']))
+    expect(harness.spawns[0]?.env).toEqual({ CI: '1', NO_COLOR: '1' })
+    expect(harness.spawns[0]?.argv.some(value => value.includes(';') || value.includes('&&'))).toBe(false)
+  })
+
+  it('rejects output traversal and malformed model arguments before spawning', async () => {
+    const harness = toolHarness()
+    applyRemotionTools(harness.context)
+    const still = findTool(harness.tools, 'remotion_render_still')
+
+    await expect(still.execute({
+      project_path: 'demo',
+      composition_id: 'DemoPoster',
+      output_path: '../../../outside.png',
+    }, { signal: new AbortController().signal })).rejects.toThrow('escapes the session workspace')
+    await expect(still.execute({
+      project_path: 'demo',
+      composition_id: ['not-a-string'],
+      output_path: 'out/frame.png',
+    }, { signal: new AbortController().signal })).rejects.toThrow('composition_id must be a string')
+    expect(harness.spawns).toHaveLength(0)
   })
 })
