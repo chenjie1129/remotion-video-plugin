@@ -4,6 +4,7 @@ import { Context } from '@deepseek-ai/cordis'
 import SkillRegistry from '@deepseek-ai/dsh-skill'
 import { describe, expect, it } from 'vitest'
 import * as RemotionVideoPlugin from '../src/index.js'
+import { resolveFrameRate } from '../src/remotion-runtime.js'
 import { apply as applyRemotionTools } from '../src/tools-plugin.js'
 
 interface CapturedTool {
@@ -156,6 +157,14 @@ describe('Remotion Video Plugin', () => {
     expect(harness.spawns[0]?.argv).toEqual(expect.arrayContaining(['compositions', '--quiet']))
     expect(harness.spawns[0]?.env).toEqual({ CI: '1', NO_COLOR: '1' })
     expect(harness.spawns[0]?.argv.some(value => value.includes(';') || value.includes('&&'))).toBe(false)
+  })
+
+  it('falls back to the real frame rate when the average is unusable', () => {
+    expect(resolveFrameRate('0/0', '30000/1001')).toBe(29.97003)
+    expect(resolveFrameRate('30/1', '25/1')).toBe(30)
+    expect(resolveFrameRate(undefined, '25/1')).toBe(25)
+    expect(resolveFrameRate('0/1', '24/1')).toBe(24)
+    expect(resolveFrameRate('invalid', 'also-invalid')).toBeNull()
   })
 
   it('rejects output traversal and malformed model arguments before spawning', async () => {

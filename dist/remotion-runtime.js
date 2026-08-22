@@ -302,13 +302,20 @@ function optionalInteger(value) {
     return Number.isInteger(parsed) ? parsed : null;
 }
 function frameRate(value) {
-    if (typeof value !== 'string' || value === '0/0')
+    if (typeof value !== 'string')
         return null;
-    const [numerator, denominator] = value.split('/').map(Number);
+    const parts = value.split('/');
+    if (parts.length !== 2)
+        return null;
+    const [numerator, denominator] = parts.map(Number);
     if (numerator === undefined || denominator === undefined
-        || !Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0)
+        || !Number.isFinite(numerator) || !Number.isFinite(denominator)
+        || numerator <= 0 || denominator <= 0)
         return null;
     return Number((numerator / denominator).toFixed(6));
+}
+export function resolveFrameRate(average, fallback) {
+    return frameRate(average) ?? frameRate(fallback);
 }
 export async function probeMedia(ctx, exec, config, project, inputPath) {
     if (project.ffprobeBin === undefined)
@@ -340,7 +347,7 @@ export async function probeMedia(ctx, exec, config, project, inputPath) {
             codec: typeof stream.codec_name === 'string' ? stream.codec_name : 'unknown',
             width: optionalInteger(stream.width),
             height: optionalInteger(stream.height),
-            fps: frameRate(stream.avg_frame_rate ?? stream.r_frame_rate),
+            fps: resolveFrameRate(stream.avg_frame_rate, stream.r_frame_rate),
             sampleRate: optionalInteger(stream.sample_rate),
             channels: optionalInteger(stream.channels),
         })),

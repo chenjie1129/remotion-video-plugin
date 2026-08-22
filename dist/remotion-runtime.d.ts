@@ -77,6 +77,7 @@ export declare function browserArguments(ctx: HarnessContext, exec: ToolExecutio
 export declare function runManaged(ctx: HarnessContext, exec: ToolExecutionContext, config: NormalizedToolsConfig, cwd: string, argv: readonly string[], env?: NodeJS.ProcessEnv): Promise<ManagedRun>;
 export declare function parseCompositionIds(output: string): string[];
 export declare function inspectArtifact(project: ProjectContext, path: string, kind: Artifact['kind']): Promise<Artifact>;
+export declare function resolveFrameRate(average: unknown, fallback: unknown): number | null;
 export declare function probeMedia(ctx: HarnessContext, exec: ToolExecutionContext, config: NormalizedToolsConfig, project: ProjectContext, inputPath: string): Promise<MediaProbe>;
 export {};
 //# sourceMappingURL=remotion-runtime.d.ts.map

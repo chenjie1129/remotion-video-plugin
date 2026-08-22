@@ -28,6 +28,6 @@ Wait for required CI, review the complete diff and packed contents, then merge w
 4. Verify the npm version, public access, provenance, unpacked files, and clean-profile install by package name.
 5. Update the DeepSeek Harness community discussion, plugin directory pull request, and related community posts with the release link and evidence.
 
-The npm workflow uses GitHub OIDC trusted publishing when configured for repository `chenjie1129/remotion-video-plugin` and workflow `publish.yml`. For the first package publication, an owner may need to establish the package or provide a short-lived granular `NPM_TOKEN`; remove that secret after trusted publishing is confirmed. Never commit or print npm credentials.
+The npm workflow resolves `refs/tags/vX.Y.Z` explicitly, verifies that the checked-out commit matches that tag, and requires a non-draft GitHub release before publication. It uses GitHub OIDC trusted publishing when configured for repository `chenjie1129/remotion-video-plugin` and workflow `publish.yml`. For the first package publication, an owner may need to establish the package or provide a short-lived granular `NPM_TOKEN`; remove that secret after trusted publishing is confirmed. Never commit or print npm credentials.
 
 If npm publication fails, keep the GitHub release valid, report npm as unavailable, and do not claim the package-name installation path works.

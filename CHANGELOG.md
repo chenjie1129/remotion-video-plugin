@@ -6,6 +6,8 @@
 - Added Node 22/24 CI, a real Harness/Remotion integration workflow, release verification, and npm trusted-publishing automation.
 - Added an explicit compatibility matrix, release procedure, expanded threat model, and synchronized English and Simplified Chinese documentation.
 - Made the npm package the versioned installation channel while retaining pinned GitHub and release-tarball options.
+- Required the npm publisher to check out an exact semver tag backed by a non-draft GitHub release.
+- Made media probing fall back to `r_frame_rate` when ffprobe's average frame rate is missing or unusable.
 
 ## 0.3.0 - 2026-08-22
 

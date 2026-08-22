@@ -396,11 +396,18 @@ function optionalInteger(value: unknown): number | null {
 }
 
 function frameRate(value: unknown): number | null {
-  if (typeof value !== 'string' || value === '0/0') return null
-  const [numerator, denominator] = value.split('/').map(Number)
+  if (typeof value !== 'string') return null
+  const parts = value.split('/')
+  if (parts.length !== 2) return null
+  const [numerator, denominator] = parts.map(Number)
   if (numerator === undefined || denominator === undefined
-    || !Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) return null
+    || !Number.isFinite(numerator) || !Number.isFinite(denominator)
+    || numerator <= 0 || denominator <= 0) return null
   return Number((numerator / denominator).toFixed(6))
+}
+
+export function resolveFrameRate(average: unknown, fallback: unknown): number | null {
+  return frameRate(average) ?? frameRate(fallback)
 }
 
 export async function probeMedia(
@@ -437,7 +444,7 @@ export async function probeMedia(
       codec: typeof stream.codec_name === 'string' ? stream.codec_name : 'unknown',
       width: optionalInteger(stream.width),
       height: optionalInteger(stream.height),
-      fps: frameRate(stream.avg_frame_rate ?? stream.r_frame_rate),
+      fps: resolveFrameRate(stream.avg_frame_rate, stream.r_frame_rate),
       sampleRate: optionalInteger(stream.sample_rate),
       channels: optionalInteger(stream.channels),
     })),

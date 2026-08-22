@@ -22,11 +22,14 @@ if (!patch.includes("name: '@chenjie1129/dsh-remotion-video-plugin'") || !patch.
   throw new Error('bundle patch must mount both the skill and tool rows');
 }
 if (!integrationWorkflow.includes('npm run test:e2e')) throw new Error('integration workflow must run the full tool smoke');
-if (!publishWorkflow.includes('id-token: write') || !publishWorkflow.includes('npm publish --access public')) {
-  throw new Error('publish workflow must use OIDC permission and public npm publication');
+if (!publishWorkflow.includes('id-token: write') || !publishWorkflow.includes('npm publish --access public')
+  || !publishWorkflow.includes('ref: refs/tags/${{ inputs.tag }}')
+  || !publishWorkflow.includes('npm --prefix demo ci')
+  || !publishWorkflow.includes('releases/tags/${RELEASE_TAG}')) {
+  throw new Error('publish workflow must use an exact release tag, OIDC permission, and public npm publication');
 }
-if (process.env.GITHUB_REF_TYPE === 'tag' && process.env.GITHUB_REF_NAME !== expectedTag) {
-  throw new Error(`release tag ${process.env.GITHUB_REF_NAME} does not match ${expectedTag}`);
+if (process.env.RELEASE_TAG !== undefined && process.env.RELEASE_TAG !== expectedTag) {
+  throw new Error(`release tag ${process.env.RELEASE_TAG} does not match ${expectedTag}`);
 }
 if (packageJson.publishConfig?.access !== 'public' || packageJson.publishConfig?.provenance !== true) {
   throw new Error('publishConfig must require public access and provenance');
