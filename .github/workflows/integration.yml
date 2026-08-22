@@ -3,6 +3,11 @@ name: Harness and Remotion integration
 on:
   pull_request:
   workflow_dispatch:
+    inputs:
+      registry_version:
+        description: Optional published npm version to install in the isolated Harness Web profile
+        required: false
+        type: string
   release:
     types: [published]
 
@@ -63,13 +68,24 @@ jobs:
           DSH_HOME: ${{ runner.temp }}/dsh-remotion-web
           HARNESS_WEB_URL: http://127.0.0.1:3091
           HARNESS_SCREENSHOT_PATH: demo/out/harness-plugin-inventory-v0.4.png
+          REGISTRY_VERSION: ${{ inputs.registry_version }}
           REMOTION_BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: |
           set -euo pipefail
-          package_file="$(node -p "const p=require('./package.json'); p.name.slice(1).replace('/', '-') + '-' + p.version + '.tgz'")"
-          npm pack --pack-destination "$RUNNER_TEMP"
+          if [[ -n "$REGISTRY_VERSION" ]]; then
+            [[ "$REGISTRY_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+            package_file="$(npm pack "@chenjie1129/dsh-remotion-video-plugin@${REGISTRY_VERSION}" --pack-destination "$RUNNER_TEMP" --json | jq -r '.[0].filename')"
+          else
+            package_file="$(node -p "const p=require('./package.json'); p.name.slice(1).replace('/', '-') + '-' + p.version + '.tgz'")"
+            npm pack --pack-destination "$RUNNER_TEMP"
+          fi
           plugin_tarball="$RUNNER_TEMP/$package_file"
           test -f "$plugin_tarball"
+          test "$(tar -xOf "$plugin_tarball" package/package.json | jq -r .name)" = '@chenjie1129/dsh-remotion-video-plugin'
+          if [[ -n "$REGISTRY_VERSION" ]]; then
+            test "$(tar -xOf "$plugin_tarball" package/package.json | jq -r .version)" = "$REGISTRY_VERSION"
+            echo "- Installed @chenjie1129/dsh-remotion-video-plugin@${REGISTRY_VERSION} from the public npm registry." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
           cd "$DEEPSEEK_HARNESS_CHECKOUT"
           node --import tsx/esm apps/cli/src/bin.ts plugin --profile web add "$plugin_tarball"
