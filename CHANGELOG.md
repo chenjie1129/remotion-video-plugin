@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 - 2026-08-22
+
+- Replaced the single long-form skill with a focused router and eight task-specific Remotion references.
+- Added product-launch, vertical-caption, and data-story blueprints.
+- Added a ten-case bilingual model-to-render evaluation contract and automated validation.
+- Made still inspection, final rendering, and metadata evidence explicit completion gates.
+
 ## 0.1.0 - 2026-08-21
 
 - Add the standalone DeepSeek Harness bundle and Cordis plugin.
