@@ -3,93 +3,111 @@
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 [![CI](https://github.com/chenjie1129/remotion-video-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/chenjie1129/remotion-video-plugin/actions/workflows/ci.yml)
+[![Integration](https://github.com/chenjie1129/remotion-video-plugin/actions/workflows/integration.yml/badge.svg)](https://github.com/chenjie1129/remotion-video-plugin/actions/workflows/integration.yml)
+[![npm](https://img.shields.io/npm/v/@chenjie1129/dsh-remotion-video-plugin.svg)](https://www.npmjs.com/package/@chenjie1129/dsh-remotion-video-plugin)
 [![License: MIT](https://img.shields.io/badge/license-MIT-53d7ff.svg)](LICENSE)
-[![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-0.1.0--rc.5-9e7bff.svg)](docs/SMOKE_TEST_RESULTS.md)
 
-Give DeepSeek Harness a repeatable workflow for creating programmatic videos with [Remotion](https://www.remotion.dev/): inspect the project, write frame-driven React animation, preview it, and render verified output.
+Give DeepSeek Harness a structured Remotion workflow and five workspace-confined tools for diagnosing projects, discovering compositions, rendering stills and videos, and verifying output metadata.
 
 [![12-second Remotion Video Plugin demo](.github/assets/remotion-video-plugin-demo.gif)](.github/assets/remotion-video-plugin-demo.mp4)
 
-**[Watch the 12-second MP4](.github/assets/remotion-video-plugin-demo.mp4)** · [See how the proof is reproduced](docs/DEMO.md)
+**[Watch the 12-second MP4](.github/assets/remotion-video-plugin-demo.mp4)** · [Reproduce the proof](docs/DEMO.md)
 
-## Quick start
+## Install
 
-Install the plugin into the DeepSeek Harness Web profile:
+After `0.4.0` is published to npm, install the immutable version into the DeepSeek Harness Web profile:
 
 ```bash
-dsh plugin --profile web add github:chenjie1129/remotion-video-plugin
+dsh plugin --profile web add @chenjie1129/dsh-remotion-video-plugin@0.4.0
 dsh web
 ```
 
-Start a new standard-agent session, select `remotion-video` from the skill menu, or ask naturally:
-
-> Create a 15-second 16:9 launch video for my product. Use frame-driven animation, show me a preview, and render an MP4 after the checks pass.
-
-Other useful prompts:
-
-- “Turn these screenshots and copy into a polished Remotion product demo.”
-- “Improve the pacing and text animation in this existing Remotion composition.”
-- “Render a representative still first, check it, then render the final video.”
-
-## What the plugin adds
-
-- A model- and user-invocable `remotion-video` skill in the standard Harness skill catalog.
-- Guidance for project inspection, Remotion scaffolding, compositions, frame-driven animation, media handling, preview, rendering, and output verification.
-- A Harness bundle that mounts automatically when installed with `dsh plugin ... add`.
-- A permission-aware workflow: ordinary Harness tools perform file changes, installs, previews, and renders under the active policy.
-
-This plugin does not collect telemetry, store credentials, upload media, or contact an external service.
-
-## Proof it works
-
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Plugin unit tests | 2/2 passed | [Test source](tests/plugin.spec.ts) |
-| Harness bundle install | Passed | [Smoke-test results](docs/SMOKE_TEST_RESULTS.md) |
-| Composed Harness config | Plugin mounted and enabled | [Smoke-test procedure](docs/SMOKE_TEST.md) |
-| Demo source checks | ESLint and TypeScript passed | [Reproducible demo](demo/) |
-| Real render | H.264, 1280×720, 30 fps, ~12 s | [MP4](.github/assets/remotion-video-plugin-demo.mp4) |
-| Package security | No runtime service or credential access | [Security policy](SECURITY.md) |
-
-## Requirements
-
-- Node.js `^22.19.0` or `>=24.0.0`
-- DeepSeek Harness with `@deepseek-ai/dsh-skill >=0.0.1-rc.1 <0.2.0`
-- A model and the standard agent preset when the skill should be model-visible
-- Remotion dependencies only in the video project being created or edited
-
-DeepSeek Harness is in developer preview. The recorded smoke test used Harness `0.1.0-rc.5`.
-
-## Verify or remove
-
-Inspect the composed configuration without starting Harness:
+Until npm publication is verified, use the pinned GitHub release tag:
 
 ```bash
-dsh web --dump-config
+dsh plugin --profile web add github:chenjie1129/remotion-video-plugin#v0.4.0
+dsh web
 ```
 
-The output should contain `id: remotion-video-plugin` and `name: '@chenjie1129/dsh-remotion-video-plugin'`.
+Start a standard-agent session and ask:
 
-Remove the plugin with:
+> Create a 15-second 16:9 product-launch video. Diagnose the project, use frame-driven animation, render a representative still, then render and verify the MP4.
+
+## What version 0.4 includes
+
+- A user- and model-invocable `remotion-video` skill with eight focused rule modules.
+- Product-launch, vertical-captioned, and data-story blueprints.
+- Ten bilingual model-to-render evaluation cases.
+- Five tools registered through the real Harness tool and managed-subprocess seams.
+- Artifact cards with workspace-relative paths, byte sizes, SHA-256 digests, and normalized media facts.
+- Node 22/24 checks, real Harness/Remotion integration CI, and npm trusted-publishing automation.
+
+| Tool | Purpose | Writes files |
+| --- | --- | --- |
+| `remotion_doctor` | Diagnose package, entry point, CLI, ffprobe, and browser readiness | No |
+| `remotion_list_compositions` | Return registered composition IDs | No |
+| `remotion_render_still` | Render a PNG or JPEG frame | Yes |
+| `remotion_render_video` | Render and metadata-probe a video | Yes |
+| `remotion_probe_output` | Return normalized media metadata | No |
+
+The skill and executable tools are separate Cordis rows, so an operator can disable either capability without editing the other.
+
+## Proof and release status
+
+The repository includes three distinct evidence levels:
+
+| Evidence | What it proves | Current record |
+| --- | --- | --- |
+| Unit and contract checks | Skill lifecycle, bundle rows, routed resources, eval cases, tool schemas, argv safety, path rejection, artifact presentation | [Test source](tests/plugin.spec.ts) |
+| Real Harness probe | Tool registry mount, managed subprocess execution, project doctor, bundled ffprobe, and checked-in MP4 metadata | [Smoke results](docs/SMOKE_TEST_RESULTS.md) |
+| Browser-backed integration | Composition discovery plus a fresh still and video rendered through all five tools | [Integration workflow](.github/workflows/integration.yml) |
+
+The checked-in demo is a real H.264 render at 1280×720, 30 fps, and about 12 seconds. A release is not declared fully proven until the browser-backed integration workflow passes for the release commit. Probe-only success is deliberately not presented as a render-tool pass.
+
+## Requirements and safety boundary
+
+- Node.js `^22.19.0` or `>=24.0.0`.
+- DeepSeek Harness host packages before `0.2.0`: `dsh-skill`, `dsh-tools`, and `dsh-subprocess`.
+- A trusted Remotion project with its own project-local Remotion dependencies.
+- Chrome/Chromium configured by the operator, or Remotion's supported browser acquisition.
+
+Rendering executes the selected project's JavaScript and installed dependencies. Tool paths are confined to the active session workspace, commands use fixed argument arrays, output replacement is opt-in, process output and props are bounded, and cancellation reaches the managed process tree. The plugin itself collects no telemetry, stores no credentials, and uploads no media; project code, remote assets, or Remotion browser acquisition may still use the network. See [Security](SECURITY.md) and [Tool contract](docs/TOOLS.md).
+
+## Verify, configure, or remove
+
+Inspect the composed profile:
+
+```bash
+dsh --profile web --dump-config
+```
+
+It should contain both `remotion-video-plugin` and `remotion-video-tools`. A trusted browser can be configured on the tools row:
+
+```yaml
+- id: remotion-video-tools
+  name: '@chenjie1129/dsh-remotion-video-plugin/tools'
+  config:
+    browserExecutable: /absolute/path/to/chrome-or-chromium
+    browserMode: chrome-for-testing
+```
+
+Remove both rows by uninstalling the bundle, then restart Harness:
 
 ```bash
 dsh plugin --profile web remove @chenjie1129/dsh-remotion-video-plugin
 ```
 
-Restart Harness after installing or removing it.
-
-## Development
+## Development and release
 
 ```bash
-npm install
+npm ci
 npm run check
-dsh plugin --profile web add .
+npm run release:verify
+npm run test:e2e -- --probe-only
 ```
 
-To reproduce the promotional video, follow [demo/README.md](demo/README.md).
-
-More documentation: [architecture](docs/ARCHITECTURE.md) · [smoke test](docs/SMOKE_TEST.md) · [contributing](CONTRIBUTING.md) · [changelog](CHANGELOG.md)
+Rendering changes must also pass the full `npm run test:e2e` command with a real Harness checkout and approved browser. See [Compatibility](docs/COMPATIBILITY.md), [Smoke test](docs/SMOKE_TEST.md), [Release procedure](docs/RELEASING.md), [Contributing](CONTRIBUTING.md), and [Changelog](CHANGELOG.md).
 
 ## Project status and license
 
-This is an independent community plugin, not an official DeepSeek or Remotion project. The plugin is MIT licensed. Remotion has its own license terms; users are responsible for checking them for their team and usage model.
+This is an independent community plugin, not an official DeepSeek or Remotion project. The plugin is MIT licensed. Remotion has separate license terms; users are responsible for checking them for their team and usage model.

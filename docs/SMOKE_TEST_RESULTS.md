@@ -1,5 +1,35 @@
 # Smoke-test results
 
+## 2026-08-22 - version 0.4.0 release candidate
+
+Result: **LOCAL CONTRACTS PASS; HOSTED RENDER GATE PENDING**
+
+Environment:
+
+- DeepSeek Harness local checkout: `0.1.0-rc.5`
+- Harness commit: `028eeb2dbb9f` (checkout already had unrelated local changes)
+- Node.js: `22.22.0`
+- npm: `10.9.4`; profile pnpm: `11.22.0`
+- Host: macOS restricted workspace
+
+Evidence:
+
+1. `npm run check` passed 7 unit/contract tests, validated 10 bilingual model-to-render cases, compiled TypeScript, and inspected a 47-file npm payload.
+2. `npm run release:verify` confirmed the stable version, matching lockfile and changelog, synchronized README release number, both Cordis rows, full integration command, and npm OIDC/publication contract.
+3. `npm --prefix demo run lint` passed ESLint and TypeScript checks.
+4. The real Harness `ToolRuntime` and `LocalSubprocessRuntime` mounted the tools plugin. Probe-only passed `remotion_doctor` and `remotion_probe_output` against the checked-in real render.
+5. ffprobe reported H.264 video at 1280×720 and 30 fps, AAC stereo audio at 48 kHz, 12.053333-second duration, and 2,148,862 bytes.
+6. The `0.4.0` tarball was unpacked and its 47-file payload inspected. It contained no `node_modules`, local environment files, or credentials; the final tarball checksum belongs in the GitHub release because a package cannot contain its own stable hash.
+7. That tarball installed into a brand-new isolated Web profile. `pnpm peers check` reported no peer issues, and the composed config contained both `remotion-video-plugin` and `remotion-video-tools`.
+8. Current files, packed files, tracked filenames, and Git history produced no match for the reviewed common secret/key patterns or sensitive filenames.
+9. The lockfile-only plugin install reported zero vulnerabilities from available npm data. A live audit refresh for the demo could not resolve `registry.npmjs.org`; the earlier 0.1 release record remains the last successful live demo audit.
+
+External gates not claimed as passed:
+
+- Full `npm run test:e2e` reached the real managed Remotion command but the restricted local host refused to launch Chrome (`Failed to launch the browser process`). The GitHub-hosted integration workflow must freshly discover compositions and render both artifacts before release.
+- The isolated Web bundle installed and composed correctly, but this sandbox rejected the server bind with `listen EPERM` on `127.0.0.1:3094`; therefore no new 0.4 browser inventory screenshot or HTTP 200 claim is made here.
+- npm publication, provenance, GitHub release/tag, and community post updates remain pending until the release commit is pushed and hosted checks pass.
+
 ## 2026-08-21 - version 0.1.0
 
 Result: **PASS**

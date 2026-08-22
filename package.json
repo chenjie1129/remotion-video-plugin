@@ -1,6 +1,6 @@
 {
   "name": "@chenjie1129/dsh-remotion-video-plugin",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Remotion video creation and verified rendering plugin for DeepSeek Harness",
   "keywords": [
     "deepseek-harness",
@@ -11,6 +11,10 @@
   ],
   "license": "MIT",
   "author": "chenjie1129",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "type": "module",
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
@@ -56,6 +60,7 @@
     "test:watch": "vitest",
     "test:e2e": "npm run build && node scripts/tool-e2e.mjs",
     "eval:validate": "node scripts/validate-evaluations.mjs",
+    "release:verify": "node scripts/verify-release.mjs",
     "check": "npm run test && npm run eval:validate && npm run build && npm pack --dry-run",
     "prepack": "npm run build"
   },

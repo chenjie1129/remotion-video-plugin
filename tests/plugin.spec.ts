@@ -175,4 +175,48 @@ describe('Remotion Video Plugin', () => {
     }, { signal: new AbortController().signal })).rejects.toThrow('composition_id must be a string')
     expect(harness.spawns).toHaveLength(0)
   })
+
+  it('presents render calls and verified artifacts without exposing absolute paths', () => {
+    const harness = toolHarness()
+    applyRemotionTools(harness.context)
+    const still = findTool(harness.tools, 'remotion_render_still')
+    const video = findTool(harness.tools, 'remotion_render_video')
+    const artifact = {
+      path: 'demo/out/launch.mp4',
+      sizeBytes: 2_148_862,
+      sha256: 'a'.repeat(64),
+      kind: 'video',
+    }
+
+    expect(still.presentCall?.({
+      composition_id: 'Launch',
+      output_path: 'out/poster.png',
+      frame: 90,
+    })).toEqual({
+      card: 'generic',
+      title: 'Render still Launch',
+      kind: 'execute',
+      rawInput: { frame: 90, output: 'out/poster.png' },
+      locations: [{ path: 'out/poster.png' }],
+    })
+    expect(video.output.presentationMeta?.({}, { artifact })).toEqual({
+      path: 'demo/out/launch.mp4',
+      kind: 'video',
+      sizeBytes: 2_148_862,
+    })
+    expect(video.presentResult?.({}, {
+      content: [],
+      isError: false,
+      meta: { path: artifact.path, kind: artifact.kind, sizeBytes: artifact.sizeBytes },
+    })).toEqual({
+      card: 'generic',
+      title: 'Rendered video demo/out/launch.mp4',
+      content: [{ type: 'text', text: '2148862 bytes; metadata verified' }],
+    })
+    expect(JSON.stringify(video.presentResult?.({}, {
+      content: [],
+      isError: false,
+      meta: { path: artifact.path, kind: artifact.kind, sizeBytes: artifact.sizeBytes },
+    }))).not.toContain(process.cwd())
+  })
 })

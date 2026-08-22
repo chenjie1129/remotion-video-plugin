@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 - 2026-08-22
+
+- Added contract coverage and release documentation for generic Harness call/result cards, artifact paths, SHA-256 digests, and normalized media facts.
+- Added Node 22/24 CI, a real Harness/Remotion integration workflow, release verification, and npm trusted-publishing automation.
+- Added an explicit compatibility matrix, release procedure, expanded threat model, and synchronized English and Simplified Chinese documentation.
+- Made the npm package the versioned installation channel while retaining pinned GitHub and release-tarball options.
+
 ## 0.3.0 - 2026-08-22
 
 - Added workspace-confined `remotion_doctor`, `remotion_list_compositions`, `remotion_render_still`, `remotion_render_video`, and `remotion_probe_output` Harness tools.
