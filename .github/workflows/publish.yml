@@ -1,0 +1,41 @@
+name: Publish npm package
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing GitHub release tag to publish after CI and integration pass
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    if: startsWith(inputs.tag, 'v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Use a trusted-publishing capable npm CLI
+        run: npm install --global npm@latest
+
+      - run: npm ci
+      - run: npm run check
+      - name: Verify tag and release contract
+        env:
+          GITHUB_REF_TYPE: tag
+          GITHUB_REF_NAME: ${{ inputs.tag }}
+        run: npm run release:verify
+      - name: Publish public package with provenance
+        run: npm publish --access public
