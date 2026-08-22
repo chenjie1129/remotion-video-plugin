@@ -27,6 +27,8 @@ Pass requires composition discovery, a newly rendered still, a newly rendered vi
 
 The same workflow packs the candidate, installs it into a brand-new Harness Web profile, checks both configured ids, starts the real server, requires HTTP 200, and runs `scripts/web-smoke.mjs` with system Chrome. The browser smoke dismisses keyless onboarding without storing a credential, opens Settings, filters the plugin inventory, requires exactly the skill and tool package modules to be mounted and enabled, records their runtime-generated Loader entry ids, rejects alerts or browser/network errors, and uploads a full-page inventory screenshot even when a later assertion fails.
 
+After npm publication, manually dispatch `integration.yml` with `registry_version` set to the exact stable version, for example `0.4.0`. That mode downloads the named public npm package, verifies the tarball name and version, installs that registry artifact into the clean Harness Web profile, and runs the same boot and browser-inventory gate. Pull requests and release events keep using the locally packed candidate.
+
 ## Isolated Harness profile
 
 Build a tarball and use a temporary Harness home so the test cannot alter a normal profile:

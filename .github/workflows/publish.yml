@@ -50,6 +50,4 @@ jobs:
           test "$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}" --jq .draft)" = "false"
           npm run release:verify
       - name: Publish public package with provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
         run: npm publish --access public
