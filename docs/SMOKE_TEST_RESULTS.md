@@ -17,13 +17,13 @@ Evidence:
 2. `npm run release:verify` confirmed the stable version, matching lockfile and changelog, synchronized README release number, both Cordis rows, full render and isolated Web smokes, and the npm OIDC/publication contract.
 3. `npm --prefix demo run lint` passed ESLint and TypeScript checks.
 4. The real Harness `ToolRuntime` and `LocalSubprocessRuntime` mounted all five tools and discovered `RemotionVideoPluginDemo`, `SocialPreview`, and `DemoPoster`.
-5. Hosted integration run [32549791609](https://github.com/chenjie1129/remotion-video-plugin/actions/runs/32549791609) built the full clean Harness checkout and passed the real registry/subprocess render and isolated Web gate in 3m49s.
+5. Final-head integration run [32550322333](https://github.com/chenjie1129/remotion-video-plugin/actions/runs/32550322333) built the full clean Harness checkout and passed the real registry/subprocess render and isolated Web gate in 3m47s.
 6. The hosted render produced a 1,593-byte PNG (`sha256:52b5af20ad16ea14cfa8bfe05d067205936deb4fb6cb181d1ac927b2f1e722f0`) and a 2,212,827-byte MP4 (`sha256:61f6ad93484a26af7585fdc0bdb610553f2564d6a18408b3e958d2672ce21af1`).
 7. ffprobe verified the fresh MP4 as H.264 at 1280×720 and 30 fps with AAC stereo audio at 48 kHz and a duration of 12.053333 seconds.
 8. The `0.4.0` tarball was unpacked and its 48-file payload inspected. It contained no `node_modules`, local environment files, or credentials; the final tarball checksum belongs in the GitHub release because a package cannot contain its own stable hash.
 9. That exact tarball installed into a brand-new isolated Web profile. `pnpm peers check` reported no peer issues, and the composed config contained both `remotion-video-plugin` and `remotion-video-tools`.
 10. The real Harness Web server returned HTTP 200. Chrome found exactly the two package modules, reported both as `Mounted, Enabled`, and recorded distinct Loader ids `include:remotion-video-plugin` and `include:remotion-video-tools`.
-11. The browser proof reported empty console-error, console-warning, page-error, request-failure, and alert collections. The full-page inventory screenshot, PNG, and MP4 were uploaded as artifact `remotion-tool-smoke-f011bcbda8a4f255b01fd33ee1ce845ab074c763` (artifact digest `sha256:93993ff2511d258e53390ebb7b3667fd54112a42f6c0e90bbb45ad54e37240c6`).
+11. The browser proof reported empty console-error, console-warning, page-error, request-failure, and alert collections. The full-page inventory screenshot, PNG, and MP4 were uploaded as artifact `remotion-tool-smoke-f898b8ea38f17c2ade6cf3b44828a09a3223cccb` (artifact digest `sha256:0e1c95dda751649a1f7b1ad48a80b6fa77342461222a4433c46cf65c82ce8d30`).
 12. The first hosted Web-gate attempt correctly failed because it conflated configured ids with runtime-generated Loader ids. The corrected assertion now checks configured ids in dumped config, exact package modules in the browser inventory, and unique Loader ids at runtime.
 13. Current files, packed files, tracked filenames, and Git history produced no match for the reviewed common secret/key patterns or sensitive filenames.
 14. The lockfile-only plugin install reported zero vulnerabilities from available npm data. A live audit refresh for the demo could not resolve `registry.npmjs.org`; the earlier 0.1 release record remains the last successful live demo audit.
@@ -31,7 +31,7 @@ Evidence:
 Remaining publication steps (not failed test gates):
 
 - The restricted local host still rejects the isolated Web server bind with `listen EPERM` on `127.0.0.1:3094`. The successful clean GitHub-hosted gate is the authoritative 0.4 Web evidence.
-- Merge the Web-gate follow-up, create the annotated `v0.4.0` tag and GitHub release, pass the release-triggered integration run, publish and verify npm provenance, then update the community post.
+- Create the annotated `v0.4.0` tag and GitHub release, pass the release-triggered integration run, publish and verify npm provenance, then update the community post.
 
 ## 2026-08-21 - version 0.1.0
 
