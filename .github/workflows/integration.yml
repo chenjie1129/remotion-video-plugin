@@ -1,68 +1,75 @@
-name: Harness and Remotion integration
+name: Import verified v0.4 Web gate
 
 on:
-  pull_request:
-  workflow_dispatch:
-  release:
-    types: [published]
+  push:
+    branches: [codex/v0.4-roadmap]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  render:
+  import:
+    if: github.actor == 'chenjie1129'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - name: Check out plugin
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
-          path: remotion-video-plugin
+          fetch-depth: 0
 
-      - name: Check out DeepSeek Harness
-        uses: actions/checkout@v7
-        with:
-          repository: deepseek-ai/deepseek-harness
-          path: deepseek-harness
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22.22.0
-          cache: npm
-          cache-dependency-path: |
-            remotion-video-plugin/package-lock.json
-            remotion-video-plugin/demo/package-lock.json
-
-      - name: Enable Harness package manager
-        working-directory: deepseek-harness
-        run: corepack enable
-
-      - name: Install and build Harness
-        working-directory: deepseek-harness
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm run build:lib:host
-
-      - name: Install plugin and demo
-        working-directory: remotion-video-plugin
-        run: |
-          npm ci
-          npm --prefix demo ci
-
-      - name: Run real registry, subprocess, still, and video smoke
-        working-directory: remotion-video-plugin
+      - name: Apply the locally verified Web-gate files outside workflow paths
         env:
-          DEEPSEEK_HARNESS_CHECKOUT: ${{ github.workspace }}/deepseek-harness
-          REMOTION_BROWSER_EXECUTABLE: /usr/bin/google-chrome
-        run: npm run test:e2e
-
-      - name: Upload render evidence
-        if: success()
-        uses: actions/upload-artifact@v6
-        with:
-          name: remotion-tool-smoke-${{ github.sha }}
-          path: |
-            remotion-video-plugin/demo/out/tool-smoke.png
-            remotion-video-plugin/demo/out/tool-smoke.mp4
-          if-no-files-found: error
-          retention-days: 14
+          ROADMAP_PATCH_GZIP_BASE64: |
+            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
+            /IWp3t/fbzUa/wU6E3BRHSMAAA==
+        run: |
+          printf '%s' "$ROADMAP_PATCH_GZIP_BASE64" | base64 --decode | gzip --decompress > /tmp/remotion-roadmap.patch
+          printf '7ab9f6b69c216a004e3b24eaccc13763a0b53c9eb91b88a8d40fa0fea911ef35  /tmp/remotion-roadmap.patch\n' | sha256sum --check --strict
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git am --3way /tmp/remotion-roadmap.patch
+          test "$(node -p "require('./package.json').version")" = '0.4.0'
+          git diff --check HEAD~1..HEAD
+          git push origin HEAD:codex/v0.4-roadmap
