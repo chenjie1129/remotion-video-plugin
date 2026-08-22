@@ -2,7 +2,7 @@
 
 ## 2026-08-22 - version 0.4.0 release candidate
 
-Result: **LOCAL CONTRACTS PASS; HOSTED RENDER GATE PENDING**
+Result: **PASS**
 
 Environment:
 
@@ -23,12 +23,14 @@ Evidence:
 7. That tarball installed into a brand-new isolated Web profile. `pnpm peers check` reported no peer issues, and the composed config contained both `remotion-video-plugin` and `remotion-video-tools`.
 8. Current files, packed files, tracked filenames, and Git history produced no match for the reviewed common secret/key patterns or sensitive filenames.
 9. The lockfile-only plugin install reported zero vulnerabilities from available npm data. A live audit refresh for the demo could not resolve `registry.npmjs.org`; the earlier 0.1 release record remains the last successful live demo audit.
+10. GitHub Actions run [32546671798](https://github.com/chenjie1129/remotion-video-plugin/actions/runs/32546671798) checked out a clean DeepSeek Harness, built it, installed the plugin and demo from their lockfiles, and passed the real Harness registry/subprocess render smoke in 57 seconds.
+11. The hosted run registered all five tools, discovered `RemotionVideoPluginDemo`, `SocialPreview`, and `DemoPoster`, rendered a 1,593-byte PNG (`sha256:52b5af20ad16ea14cfa8bfe05d067205936deb4fb6cb181d1ac927b2f1e722f0`), and rendered a 2,212,827-byte MP4 (`sha256:61f6ad93484a26af7585fdc0bdb610553f2564d6a18408b3e958d2672ce21af1`).
+12. The hosted probe verified the fresh MP4 as H.264 at 1280x720 and 30 fps with AAC stereo audio at 48 kHz and a duration of 12.053333 seconds. GitHub uploaded the PNG and MP4 as render evidence.
 
-External gates not claimed as passed:
+Remaining release gates not claimed as passed:
 
-- Full `npm run test:e2e` reached the real managed Remotion command but the restricted local host refused to launch Chrome (`Failed to launch the browser process`). The GitHub-hosted integration workflow must freshly discover compositions and render both artifacts before release.
-- The isolated Web bundle installed and composed correctly, but this sandbox rejected the server bind with `listen EPERM` on `127.0.0.1:3094`; therefore no new 0.4 browser inventory screenshot or HTTP 200 claim is made here.
-- npm publication, provenance, GitHub release/tag, and community post updates remain pending until the release commit is pushed and hosted checks pass.
+- The restricted local host still refused to launch Chrome and rejected the isolated Web server bind with `listen EPERM` on `127.0.0.1:3094`; therefore no new local 0.4 browser inventory screenshot or HTTP 200 claim is made here. The clean GitHub-hosted Harness render is the browser-backed runtime evidence for this release candidate.
+- npm publication, provenance, GitHub release/tag, and community post updates remain pending until the pull request is reviewed and merged.
 
 ## 2026-08-21 - version 0.1.0
 
