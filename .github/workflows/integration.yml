@@ -1,68 +1,104 @@
-name: Import verified v0.4 Web-gate evidence
+name: Harness and Remotion integration
 
 on:
-  push:
-    branches: [codex/v0.4-roadmap]
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  import:
-    if: github.actor == 'chenjie1129'
+  render:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out plugin
+        uses: actions/checkout@v7
         with:
-          fetch-depth: 0
+          path: remotion-video-plugin
 
-      - name: Apply the locally verified Web-gate evidence outside workflow paths
-        env:
-          ROADMAP_PATCH_GZIP_BASE64: |
-            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
-            08x3QkLKyVnbVmrw214Yns5m/wQiW8lT1BwAAA==
+      - name: Check out DeepSeek Harness
+        uses: actions/checkout@v7
+        with:
+          repository: deepseek-ai/deepseek-harness
+          path: deepseek-harness
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.22.0
+          cache: npm
+          cache-dependency-path: |
+            remotion-video-plugin/package-lock.json
+            remotion-video-plugin/demo/package-lock.json
+
+      - name: Enable Harness package manager
+        working-directory: deepseek-harness
+        run: corepack enable
+
+      - name: Install and build Harness
+        working-directory: deepseek-harness
         run: |
-          printf '%s' "$ROADMAP_PATCH_GZIP_BASE64" | base64 --decode | gzip --decompress > /tmp/remotion-roadmap.patch
-          printf '5a8b30f32a6e4c10ff6e96565443657067f4e4deec27707da4a60581a21ed0d9  /tmp/remotion-roadmap.patch\n' | sha256sum --check --strict
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git am --3way /tmp/remotion-roadmap.patch
-          test "$(node -p "require('./package.json').version")" = '0.4.0'
-          git diff --check HEAD~1..HEAD
-          git push origin HEAD:codex/v0.4-roadmap
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+      - name: Install plugin and demo
+        working-directory: remotion-video-plugin
+        run: |
+          npm ci
+          npm --prefix demo ci
+
+      - name: Run real registry, subprocess, still, and video smoke
+        working-directory: remotion-video-plugin
+        env:
+          DEEPSEEK_HARNESS_CHECKOUT: ${{ github.workspace }}/deepseek-harness
+          REMOTION_BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: npm run test:e2e
+
+      - name: Install, boot, and inspect an isolated Harness Web profile
+        working-directory: remotion-video-plugin
+        env:
+          DEEPSEEK_HARNESS_CHECKOUT: ${{ github.workspace }}/deepseek-harness
+          DSH_HOME: ${{ runner.temp }}/dsh-remotion-web
+          HARNESS_WEB_URL: http://127.0.0.1:3091
+          HARNESS_SCREENSHOT_PATH: demo/out/harness-plugin-inventory-v0.4.png
+          REMOTION_BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: |
+          set -euo pipefail
+          package_file="$(node -p "const p=require('./package.json'); p.name.slice(1).replace('/', '-') + '-' + p.version + '.tgz'")"
+          npm pack --pack-destination "$RUNNER_TEMP"
+          plugin_tarball="$RUNNER_TEMP/$package_file"
+          test -f "$plugin_tarball"
+
+          cd "$DEEPSEEK_HARNESS_CHECKOUT"
+          node --import tsx/esm apps/cli/src/bin.ts plugin --profile web add "$plugin_tarball"
+          config="$(node --import tsx/esm apps/cli/src/bin.ts --profile web --dump-config)"
+          grep -q 'id: remotion-video-plugin' <<<"$config"
+          grep -q 'id: remotion-video-tools' <<<"$config"
+          corepack pnpm --dir "$DSH_HOME/profiles/web" peers check
+
+          web_log="$RUNNER_TEMP/remotion-harness-web.log"
+          node --import tsx/esm apps/cli/src/bin.ts web --port 3091 >"$web_log" 2>&1 &
+          web_pid=$!
+          trap 'status=$?; kill "$web_pid" 2>/dev/null || true; wait "$web_pid" 2>/dev/null || true; cat "$web_log"; exit "$status"' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error "$HARNESS_WEB_URL" >/dev/null; then break; fi
+            sleep 1
+          done
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' "$HARNESS_WEB_URL")" = '200'
+
+          cd "$GITHUB_WORKSPACE/remotion-video-plugin"
+          node scripts/web-smoke.mjs
+
+      - name: Upload render evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: remotion-tool-smoke-${{ github.sha }}
+          path: |
+            remotion-video-plugin/demo/out/tool-smoke.png
+            remotion-video-plugin/demo/out/tool-smoke.mp4
+            remotion-video-plugin/demo/out/harness-plugin-inventory-v0.4.png
+          if-no-files-found: error
+          retention-days: 14
