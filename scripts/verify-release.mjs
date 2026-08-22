@@ -21,7 +21,12 @@ if (!english.includes(packageJson.version) || !chinese.includes(packageJson.vers
 if (!patch.includes("name: '@chenjie1129/dsh-remotion-video-plugin'") || !patch.includes("name: '@chenjie1129/dsh-remotion-video-plugin/tools'")) {
   throw new Error('bundle patch must mount both the skill and tool rows');
 }
-if (!integrationWorkflow.includes('npm run test:e2e')) throw new Error('integration workflow must run the full tool smoke');
+if (!integrationWorkflow.includes('npm run test:e2e')
+  || !integrationWorkflow.includes('node scripts/web-smoke.mjs')
+  || !integrationWorkflow.includes('plugin --profile web add')
+  || !integrationWorkflow.includes("write-out '%{http_code}'")) {
+  throw new Error('integration workflow must run the full tool and isolated Web smokes');
+}
 if (!publishWorkflow.includes('id-token: write') || !publishWorkflow.includes('npm publish --access public')
   || !publishWorkflow.includes('ref: refs/tags/${{ inputs.tag }}')
   || !publishWorkflow.includes('npm --prefix demo ci')

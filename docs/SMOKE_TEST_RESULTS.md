@@ -6,31 +6,32 @@ Result: **PASS**
 
 Environment:
 
-- DeepSeek Harness local checkout: `0.1.0-rc.5`
-- Harness commit: `028eeb2dbb9f` (checkout already had unrelated local changes)
+- DeepSeek Harness clean hosted checkout: `b150a551b8d465e31e418e1b2eaf5e79bbb7d28e`
 - Node.js: `22.22.0`
-- npm: `10.9.4`; profile pnpm: `11.22.0`
-- Host: macOS restricted workspace
+- Harness build pnpm: `11.7.0`; isolated profile pnpm: `11.22.0`
+- Host: GitHub-hosted Ubuntu runner with system Chrome
 
 Evidence:
 
-1. `npm run check` passed 7 unit/contract tests, validated 10 bilingual model-to-render cases, compiled TypeScript, and inspected a 47-file npm payload.
-2. `npm run release:verify` confirmed the stable version, matching lockfile and changelog, synchronized README release number, both Cordis rows, full integration command, and npm OIDC/publication contract.
+1. `npm run check` passed 8 unit/contract tests, validated 10 bilingual model-to-render cases, compiled TypeScript, and inspected a 48-file npm payload.
+2. `npm run release:verify` confirmed the stable version, matching lockfile and changelog, synchronized README release number, both Cordis rows, full render and isolated Web smokes, and the npm OIDC/publication contract.
 3. `npm --prefix demo run lint` passed ESLint and TypeScript checks.
-4. The real Harness `ToolRuntime` and `LocalSubprocessRuntime` mounted the tools plugin. Probe-only passed `remotion_doctor` and `remotion_probe_output` against the checked-in real render.
-5. ffprobe reported H.264 video at 1280×720 and 30 fps, AAC stereo audio at 48 kHz, 12.053333-second duration, and 2,148,862 bytes.
-6. The `0.4.0` tarball was unpacked and its 47-file payload inspected. It contained no `node_modules`, local environment files, or credentials; the final tarball checksum belongs in the GitHub release because a package cannot contain its own stable hash.
-7. That tarball installed into a brand-new isolated Web profile. `pnpm peers check` reported no peer issues, and the composed config contained both `remotion-video-plugin` and `remotion-video-tools`.
-8. Current files, packed files, tracked filenames, and Git history produced no match for the reviewed common secret/key patterns or sensitive filenames.
-9. The lockfile-only plugin install reported zero vulnerabilities from available npm data. A live audit refresh for the demo could not resolve `registry.npmjs.org`; the earlier 0.1 release record remains the last successful live demo audit.
-10. GitHub Actions run [32546671798](https://github.com/chenjie1129/remotion-video-plugin/actions/runs/32546671798) checked out a clean DeepSeek Harness, built it, installed the plugin and demo from their lockfiles, and passed the real Harness registry/subprocess render smoke in 57 seconds.
-11. The hosted run registered all five tools, discovered `RemotionVideoPluginDemo`, `SocialPreview`, and `DemoPoster`, rendered a 1,593-byte PNG (`sha256:52b5af20ad16ea14cfa8bfe05d067205936deb4fb6cb181d1ac927b2f1e722f0`), and rendered a 2,212,827-byte MP4 (`sha256:61f6ad93484a26af7585fdc0bdb610553f2564d6a18408b3e958d2672ce21af1`).
-12. The hosted probe verified the fresh MP4 as H.264 at 1280x720 and 30 fps with AAC stereo audio at 48 kHz and a duration of 12.053333 seconds. GitHub uploaded the PNG and MP4 as render evidence.
+4. The real Harness `ToolRuntime` and `LocalSubprocessRuntime` mounted all five tools and discovered `RemotionVideoPluginDemo`, `SocialPreview`, and `DemoPoster`.
+5. Hosted integration run [32549791609](https://github.com/chenjie1129/remotion-video-plugin/actions/runs/32549791609) built the full clean Harness checkout and passed the real registry/subprocess render and isolated Web gate in 3m49s.
+6. The hosted render produced a 1,593-byte PNG (`sha256:52b5af20ad16ea14cfa8bfe05d067205936deb4fb6cb181d1ac927b2f1e722f0`) and a 2,212,827-byte MP4 (`sha256:61f6ad93484a26af7585fdc0bdb610553f2564d6a18408b3e958d2672ce21af1`).
+7. ffprobe verified the fresh MP4 as H.264 at 1280×720 and 30 fps with AAC stereo audio at 48 kHz and a duration of 12.053333 seconds.
+8. The `0.4.0` tarball was unpacked and its 48-file payload inspected. It contained no `node_modules`, local environment files, or credentials; the final tarball checksum belongs in the GitHub release because a package cannot contain its own stable hash.
+9. That exact tarball installed into a brand-new isolated Web profile. `pnpm peers check` reported no peer issues, and the composed config contained both `remotion-video-plugin` and `remotion-video-tools`.
+10. The real Harness Web server returned HTTP 200. Chrome found exactly the two package modules, reported both as `Mounted, Enabled`, and recorded distinct Loader ids `include:remotion-video-plugin` and `include:remotion-video-tools`.
+11. The browser proof reported empty console-error, console-warning, page-error, request-failure, and alert collections. The full-page inventory screenshot, PNG, and MP4 were uploaded as artifact `remotion-tool-smoke-f011bcbda8a4f255b01fd33ee1ce845ab074c763` (artifact digest `sha256:93993ff2511d258e53390ebb7b3667fd54112a42f6c0e90bbb45ad54e37240c6`).
+12. The first hosted Web-gate attempt correctly failed because it conflated configured ids with runtime-generated Loader ids. The corrected assertion now checks configured ids in dumped config, exact package modules in the browser inventory, and unique Loader ids at runtime.
+13. Current files, packed files, tracked filenames, and Git history produced no match for the reviewed common secret/key patterns or sensitive filenames.
+14. The lockfile-only plugin install reported zero vulnerabilities from available npm data. A live audit refresh for the demo could not resolve `registry.npmjs.org`; the earlier 0.1 release record remains the last successful live demo audit.
 
-Remaining release gates not claimed as passed:
+Remaining publication steps (not failed test gates):
 
-- The restricted local host still refused to launch Chrome and rejected the isolated Web server bind with `listen EPERM` on `127.0.0.1:3094`; therefore no new local 0.4 browser inventory screenshot or HTTP 200 claim is made here. The clean GitHub-hosted Harness render is the browser-backed runtime evidence for this release candidate.
-- npm publication, provenance, GitHub release/tag, and community post updates remain pending until the pull request is reviewed and merged.
+- The restricted local host still rejects the isolated Web server bind with `listen EPERM` on `127.0.0.1:3094`. The successful clean GitHub-hosted gate is the authoritative 0.4 Web evidence.
+- Merge the Web-gate follow-up, create the annotated `v0.4.0` tag and GitHub release, pass the release-triggered integration run, publish and verify npm provenance, then update the community post.
 
 ## 2026-08-21 - version 0.1.0
 

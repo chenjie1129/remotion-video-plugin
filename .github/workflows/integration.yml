@@ -41,7 +41,7 @@ jobs:
         working-directory: deepseek-harness
         run: |
           pnpm install --frozen-lockfile
-          pnpm run build:lib:host
+          pnpm run build
 
       - name: Install plugin and demo
         working-directory: remotion-video-plugin
@@ -56,13 +56,49 @@ jobs:
           REMOTION_BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: npm run test:e2e
 
+      - name: Install, boot, and inspect an isolated Harness Web profile
+        working-directory: remotion-video-plugin
+        env:
+          DEEPSEEK_HARNESS_CHECKOUT: ${{ github.workspace }}/deepseek-harness
+          DSH_HOME: ${{ runner.temp }}/dsh-remotion-web
+          HARNESS_WEB_URL: http://127.0.0.1:3091
+          HARNESS_SCREENSHOT_PATH: demo/out/harness-plugin-inventory-v0.4.png
+          REMOTION_BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: |
+          set -euo pipefail
+          package_file="$(node -p "const p=require('./package.json'); p.name.slice(1).replace('/', '-') + '-' + p.version + '.tgz'")"
+          npm pack --pack-destination "$RUNNER_TEMP"
+          plugin_tarball="$RUNNER_TEMP/$package_file"
+          test -f "$plugin_tarball"
+
+          cd "$DEEPSEEK_HARNESS_CHECKOUT"
+          node --import tsx/esm apps/cli/src/bin.ts plugin --profile web add "$plugin_tarball"
+          config="$(node --import tsx/esm apps/cli/src/bin.ts --profile web --dump-config)"
+          grep -q 'id: remotion-video-plugin' <<<"$config"
+          grep -q 'id: remotion-video-tools' <<<"$config"
+          corepack pnpm --dir "$DSH_HOME/profiles/web" peers check
+
+          web_log="$RUNNER_TEMP/remotion-harness-web.log"
+          node --import tsx/esm apps/cli/src/bin.ts web --port 3091 >"$web_log" 2>&1 &
+          web_pid=$!
+          trap 'status=$?; kill "$web_pid" 2>/dev/null || true; wait "$web_pid" 2>/dev/null || true; cat "$web_log"; exit "$status"' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error "$HARNESS_WEB_URL" >/dev/null; then break; fi
+            sleep 1
+          done
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' "$HARNESS_WEB_URL")" = '200'
+
+          cd "$GITHUB_WORKSPACE/remotion-video-plugin"
+          node scripts/web-smoke.mjs
+
       - name: Upload render evidence
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v6
         with:
           name: remotion-tool-smoke-${{ github.sha }}
           path: |
             remotion-video-plugin/demo/out/tool-smoke.png
             remotion-video-plugin/demo/out/tool-smoke.mp4
+            remotion-video-plugin/demo/out/harness-plugin-inventory-v0.4.png
           if-no-files-found: error
           retention-days: 14

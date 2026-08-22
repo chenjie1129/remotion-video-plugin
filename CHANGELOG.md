@@ -8,6 +8,7 @@
 - Made the npm package the versioned installation channel while retaining pinned GitHub and release-tarball options.
 - Required the npm publisher to check out an exact semver tag backed by a non-draft GitHub release.
 - Made media probing fall back to `r_frame_rate` when ffprobe's average frame rate is missing or unusable.
+- Added a clean-profile Harness Web boot, HTTP 200, browser inventory, and console/network-error release gate.
 
 ## 0.3.0 - 2026-08-22
 
