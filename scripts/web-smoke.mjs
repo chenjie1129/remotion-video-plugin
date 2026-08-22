@@ -12,7 +12,16 @@ const {chromium} = await import(pathToFileURL(playwrightEntry).href);
 const baseUrl = process.env.HARNESS_WEB_URL ?? 'http://127.0.0.1:3091';
 const executablePath = process.env.REMOTION_BROWSER_EXECUTABLE;
 const screenshotPath = resolve(process.env.HARNESS_SCREENSHOT_PATH ?? 'demo/out/harness-plugin-inventory-v0.4.png');
-const expectedEntries = ['remotion-video-plugin', 'remotion-video-tools'];
+const expectedModules = [
+  {
+    configId: 'remotion-video-plugin',
+    moduleName: '@chenjie1129/dsh-remotion-video-plugin',
+  },
+  {
+    configId: 'remotion-video-tools',
+    moduleName: '@chenjie1129/dsh-remotion-video-plugin/tools',
+  },
+];
 const consoleErrors = [];
 const consoleWarnings = [];
 const pageErrors = [];
@@ -63,33 +72,36 @@ try {
   await search.fill('remotion-video');
   const rows = settings.locator('[data-plugin-entry]');
   await rows.first().waitFor({timeout: 10_000});
-  if (await rows.count() !== expectedEntries.length) {
-    throw new Error(`Expected ${expectedEntries.length} Remotion rows, received ${await rows.count()}.`);
-  }
-
-  const inventory = [];
-  for (const entryId of expectedEntries) {
-    const row = settings.locator(`[data-plugin-entry="${entryId}"]`);
-    if (await row.count() !== 1) throw new Error(`Missing unique inventory row ${entryId}.`);
-    const button = row.getByRole('button');
-    const label = await button.getAttribute('aria-label');
-    if (label === null || !label.includes('Mounted') || !label.includes('Enabled')) {
-      throw new Error(`Inventory row ${entryId} is not mounted and enabled: ${label ?? '(missing label)'}.`);
-    }
-    if (await row.locator('[data-phase="active"]').count() !== 1) {
-      throw new Error(`Inventory row ${entryId} does not report the active Cordis phase.`);
-    }
-    if (await row.locator('[data-enabled="true"]').count() !== 1) {
-      throw new Error(`Inventory row ${entryId} is not effectively enabled.`);
-    }
-    await button.click();
-    const loaderEntry = await row.locator('[data-loader-entry]').textContent();
-    if (loaderEntry !== entryId) throw new Error(`Inventory detail mismatch for ${entryId}: ${loaderEntry}.`);
-    inventory.push({entryId, label});
+  if (await rows.count() !== expectedModules.length) {
+    throw new Error(`Expected ${expectedModules.length} Remotion rows, received ${await rows.count()}.`);
   }
 
   await mkdir(dirname(screenshotPath), {recursive: true});
   await page.screenshot({path: screenshotPath, fullPage: true});
+  const inventory = [];
+  const loaderEntries = new Set();
+  for (const expected of expectedModules) {
+    const row = rows.filter({has: page.locator(`strong[title="${expected.moduleName}"]`)});
+    if (await row.count() !== 1) throw new Error(`Missing unique inventory module ${expected.moduleName}.`);
+    const button = row.getByRole('button');
+    const label = await button.getAttribute('aria-label');
+    if (label === null || !label.includes('Mounted') || !label.includes('Enabled')) {
+      throw new Error(`Inventory module ${expected.moduleName} is not mounted and enabled: ${label ?? '(missing label)'}.`);
+    }
+    if (await row.locator('[data-phase="active"]').count() !== 1) {
+      throw new Error(`Inventory module ${expected.moduleName} does not report the active Cordis phase.`);
+    }
+    if (await row.locator('[data-enabled="true"]').count() !== 1) {
+      throw new Error(`Inventory module ${expected.moduleName} is not effectively enabled.`);
+    }
+    await button.click();
+    const loaderEntry = (await row.locator('[data-loader-entry]').textContent())?.trim();
+    if (!loaderEntry) throw new Error(`Inventory module ${expected.moduleName} has no Loader entry id.`);
+    if (loaderEntries.has(loaderEntry)) throw new Error(`Duplicate Loader entry id ${loaderEntry}.`);
+    loaderEntries.add(loaderEntry);
+    inventory.push({...expected, loaderEntry, label});
+  }
+
   const alerts = await page.getByRole('alert').allTextContents();
   if (alerts.length > 0) throw new Error(`Harness Web rendered alerts: ${alerts.join(' | ')}`);
   if (consoleErrors.length > 0 || consoleWarnings.length > 0 || pageErrors.length > 0 || requestFailures.length > 0) {

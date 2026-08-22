@@ -25,7 +25,7 @@ npm run test:e2e
 
 Pass requires composition discovery, a newly rendered still, a newly rendered video, H.264 metadata at 1280×720 and 30 fps, and duration within 0.1 seconds of 12 seconds. `.github/workflows/integration.yml` runs this gate on a GitHub-hosted Linux runner and uploads both artifacts.
 
-The same workflow packs the candidate, installs it into a brand-new Harness Web profile, checks both composed rows, starts the real server, requires HTTP 200, and runs `scripts/web-smoke.mjs` with system Chrome. The browser smoke dismisses keyless onboarding without storing a credential, opens Settings, filters the plugin inventory, requires exactly the skill and tool rows to be mounted and enabled, rejects alerts or browser/network errors, and uploads a full-page inventory screenshot.
+The same workflow packs the candidate, installs it into a brand-new Harness Web profile, checks both configured ids, starts the real server, requires HTTP 200, and runs `scripts/web-smoke.mjs` with system Chrome. The browser smoke dismisses keyless onboarding without storing a credential, opens Settings, filters the plugin inventory, requires exactly the skill and tool package modules to be mounted and enabled, records their runtime-generated Loader entry ids, rejects alerts or browser/network errors, and uploads a full-page inventory screenshot even when a later assertion fails.
 
 ## Isolated Harness profile
 
